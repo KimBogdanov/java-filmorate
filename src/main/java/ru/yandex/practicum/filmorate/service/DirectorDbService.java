@@ -1,28 +1,34 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class DirectorDbService {
+    private final DirectorStorage directorStorage;
+
     public List<Director> getDirectors() {
-        return null;
+        return directorStorage.getAllDirectors();
     }
 
-    public Director getDirectorsById() {
-        return null;
+    public Director getDirectorById(int id) {
+        return directorStorage.getDirectorById(id);
     }
 
     public Director addDirector(Director director) {
-        return null;
+        return directorStorage.createDirector(director);
     }
 
     public Director updateDirector(Director director) {
-        return null;
+        return directorStorage.updateDirector(director);
     }
 
     public int deleteDirectorById(Integer id) {
-        return 0;
+        return directorStorage.deleteDirectorById(id);
     }
 }
