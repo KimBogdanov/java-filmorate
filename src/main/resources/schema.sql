@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS users, friends, mpa_ratings, films, genres, film_genres, directors, film_directors, film_likes CASCADE;
+DROP TABLE IF EXISTS users, friends, mpa_ratings, films, genres, film_genres, directors, film_director, film_likes CASCADE;
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -59,10 +59,10 @@ CREATE TABLE IF NOT EXISTS directors
     director_name       VARCHAR(200)    UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS film_directors
+CREATE TABLE IF NOT EXISTS film_director
 (
-    film_id             INT             REFERENCES films(film_id),
-    director_id         INT             REFERENCES directors(director_id),
+    film_id             INT             REFERENCES films(film_id) ON DELETE CASCADE,
+    director_id         INT             REFERENCES directors(director_id) ON DELETE CASCADE,
     PRIMARY KEY(film_id, director_id)
 );
 
