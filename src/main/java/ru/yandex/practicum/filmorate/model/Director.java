@@ -13,4 +13,8 @@ public class Director {
     private Integer id;
     @NotBlank
     private String name;
+
+    public Director(String name) {
+        this.name = name;
+    }
 }
