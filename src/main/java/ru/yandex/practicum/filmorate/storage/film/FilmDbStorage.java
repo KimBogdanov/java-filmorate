@@ -74,15 +74,16 @@ public class FilmDbStorage implements FilmStorage {
                 "RIGHT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID " +
                 "WHERE DIRECTOR_ID = ? " +
                 "ORDER BY RELEASE_DATE";
-        if(sortBy.equals("likes")){
+        if (sortBy.equals("likes")) {
             sql = "SELECT * " +
                     "FROM FILMS as F " +
                     "LEFT JOIN mpa_ratings AS m ON m.mpa_rating_id = f.mpa_rating_id " +
                     "RIGHT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID " +
+                    "LEFT JOIN FILM_LIKES FL on f.FILM_ID = FL.FILM_ID " +
                     "WHERE DIRECTOR_ID = ? " +
-                    "ORDER BY RATE";
+                    "GROUP BY f.film_id " +
+                    "ORDER BY COUNT(fl.FILM_ID)";
         }
-
         List<Film> films = jdbcTemplate.query(sql, this::filmMapper, directorId);
         addGenresToFilms(films);
         addDirectorsToFilms(films);

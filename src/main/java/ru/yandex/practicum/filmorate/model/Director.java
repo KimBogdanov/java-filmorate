@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class Director {
     private Integer id;

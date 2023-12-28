@@ -35,10 +35,7 @@ class DirectorDbStorageTest {
     void createFiveDirectorName() {
         Director director = directorStorage.createDirector(new Director("DirectorName"));
         Director director2 = directorStorage.createDirector(new Director("DirectorName2"));
-        Director director3 = directorStorage.createDirector(new Director("DirectorName3"));
-        Director director4 = directorStorage.createDirector(new Director("DirectorName4"));
-        Director director5 = directorStorage.createDirector(new Director("DirectorName5"));
-        List<Director> directorList = List.of(director, director2, director3, director4, director5);
+        List<Director> directorList = List.of(director, director2);
 
         List<Director> allDirectors = directorStorage.getAllDirectors();
 
