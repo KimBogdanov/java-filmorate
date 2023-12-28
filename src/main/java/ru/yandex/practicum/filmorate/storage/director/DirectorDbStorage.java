@@ -2,12 +2,15 @@ package ru.yandex.practicum.filmorate.storage.director;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -59,6 +62,38 @@ public class DirectorDbStorage implements DirectorStorage {
     public int deleteDirectorById(int id) {
         String sql = "DELETE FROM DIRECTORS WHERE DIRECTOR_ID = ?";
         return jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void updateFilmDirectors(Integer filmId, List<Director> directors) {
+        jdbcTemplate.batchUpdate("INSERT INTO FILM_DIRECTOR (FILM_ID, DIRECTOR_ID) values (?,?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, filmId);
+                        ps.setInt(2, directors.get(i).getId());
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return directors.size();
+                    }
+                });
+    }
+
+    @Override
+    public List<Director> getFilmDirectorsById(Integer id) {
+        String sql = "SELECT d.DIRECTOR_ID, d.DIRECTOR_NAME " +
+                "FROM DIRECTORS AS d " +
+                "JOIN FILM_DIRECTOR AS fd ON d.DIRECTOR_ID = fd.DIRECTOR_ID " +
+                "WHERE fd.film_id = ?";
+        return jdbcTemplate.query(sql, this::directorMapper, id);
+    }
+
+    @Override
+    public void deleteAllDirectorByFilmId(Integer id) {
+        String sqlDelete = "DELETE FROM FILM_DIRECTOR WHERE FILM_ID = ?";
+        jdbcTemplate.update(sqlDelete, id);
     }
 
     private Director directorMapper(ResultSet rs, int rowNum) throws SQLException {

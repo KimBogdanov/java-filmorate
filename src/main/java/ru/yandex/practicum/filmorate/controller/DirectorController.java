@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.DirectorDbService;
 
 import javax.validation.Valid;
 import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/directors")
@@ -33,11 +34,13 @@ public class DirectorController {
 
     @PutMapping
     public Director updateDirector(@Valid @RequestBody Director director) {
+        log.info("DirectorController updateDirector directorId {}", director.getId());
         return directorDbService.updateDirector(director);
     }
 
     @DeleteMapping("/{id}")
     public int deleteDirectorById(@PathVariable Integer id) {
+        log.info("DirectorController deleteDirectorById directorId {}", id);
         return directorDbService.deleteDirectorById(id);
     }
 }

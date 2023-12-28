@@ -55,5 +55,8 @@ public class Film {
     public void addGenreToFilm(Genre genre) {
         genres.add(genre);
     }
+    public void addDirectorToFilm(Director director) {
+        directors.add(director);
+    }
 }
 

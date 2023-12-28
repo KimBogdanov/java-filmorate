@@ -40,12 +40,14 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         checkFilm(film);
+        log.info("FilmController addFilm film {} ", film.getName());
         return filmDbService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         checkFilm(film);
+        log.info("FilmController updateFilm film {} ", film.getId());
         return filmDbService.updateFilm(film);
     }
 

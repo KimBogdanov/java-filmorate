@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
@@ -85,6 +86,7 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN mpa_ratings AS m ON m.mpa_rating_id = f.mpa_rating_id";
         List<Film> films = jdbcTemplate.query(sql, this::filmMapper);
         addGenresToFilms(films);
+        addDirectorsToFilms(films);
         return films;
     }
 
@@ -123,6 +125,24 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.query(sql, (rs) -> {
             final Film film = filmById.get(rs.getInt("film_id"));
             film.addGenreToFilm(genreBuilder(rs));
+        });
+    }
+
+    private void addDirectorsToFilms(List<Film> films) {
+        String filmIds = films.stream()
+                .map(Film::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        final Map<Integer, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        final String sql = "SELECT * " +
+                "FROM DIRECTORS AS d, FILM_DIRECTOR AS fd " +
+                "WHERE fd.DIRECTOR_ID = d.DIRECTOR_ID AND fd.film_id IN (" + filmIds + ")";
+        jdbcTemplate.query(sql, (rs) -> {
+            final Film film = filmById.get(rs.getInt("film_id"));
+            film.addDirectorToFilm(Director.builder()
+                    .id(rs.getInt("director_id"))
+                    .name(rs.getString("director_name"))
+                    .build());
         });
     }
 }
