@@ -67,6 +67,29 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        String sql = "SELECT * " +
+                "FROM FILMS as F " +
+                "LEFT JOIN mpa_ratings AS m ON m.mpa_rating_id = f.mpa_rating_id " +
+                "RIGHT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID " +
+                "WHERE DIRECTOR_ID = ? " +
+                "ORDER BY RELEASE_DATE";
+        if(sortBy.equals("likes")){
+            sql = "SELECT * " +
+                    "FROM FILMS as F " +
+                    "LEFT JOIN mpa_ratings AS m ON m.mpa_rating_id = f.mpa_rating_id " +
+                    "RIGHT JOIN FILM_DIRECTOR FD on F.FILM_ID = FD.FILM_ID " +
+                    "WHERE DIRECTOR_ID = ? " +
+                    "ORDER BY RATE";
+        }
+
+        List<Film> films = jdbcTemplate.query(sql, this::filmMapper, directorId);
+        addGenresToFilms(films);
+        addDirectorsToFilms(films);
+        return films;
+    }
+
+    @Override
     public Film getFilmById(int id) {
         String sql = "SELECT * " +
                 "FROM films AS f " +

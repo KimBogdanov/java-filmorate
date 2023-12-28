@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
@@ -91,5 +92,12 @@ public class FilmDbService {
 
     public List<Film> getPopularFilms(Integer count) {
         return filmStorage.getPopularFilms(count);
+    }
+
+    public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {
+        if (!directorStorage.doesDirectorExist(directorId)){
+            throw new NotFoundException("Режиссер не найден id = " + directorId);
+        }
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 }

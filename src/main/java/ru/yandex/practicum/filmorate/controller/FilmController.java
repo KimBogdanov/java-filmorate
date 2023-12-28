@@ -76,4 +76,21 @@ public class FilmController {
             throw new ValidationException("Дата релиза не должна быть раньше 28 декабря 1895 года. Введено: "
                     + film.getReleaseDate());
     }
+
+    /**
+     * Получает список фильмов режиссера по указанному идентификатору,
+     * отсортированный по количеству лайков или году выпуска в соответствии
+     * с заданным параметром сортировки.
+     *
+     * @param directorId Идентификатор режиссера.
+     * @param sortBy     Параметр сортировки, может принимать значения "year" или "likes".
+     * @return Список фильмов режиссера отсортированный по указанному параметру.
+     */
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmsByDirector(
+            @PathVariable Integer directorId,
+            @RequestParam(required = false) String sortBy) {
+        log.info("FilmController getFilmsByDirector director {} sortBy {} ", directorId, sortBy);
+        return filmDbService.getFilmsByDirector(directorId, sortBy);
+    }
 }

@@ -100,4 +100,9 @@ public class DirectorDbStorage implements DirectorStorage {
         return new Director(rs.getInt("director_id"),
                 rs.getString("director_name"));
     }
+    @Override
+    public boolean doesDirectorExist(Integer directorId) {
+        String sql = "SELECT 1 FROM DIRECTORS WHERE DIRECTOR_ID = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> true, directorId).stream().findFirst().orElse(false);
+    }
 }
