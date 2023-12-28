@@ -22,9 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class RecomServiceTest {
+class RecommendationServiceTest {
 
-    private final RecomService recomService;
+    private final RecommendationService recommendationService;
     private final LikeDbStorage likeDbStorage;
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
@@ -59,7 +59,7 @@ class RecomServiceTest {
         likeDbStorage.addLike(testFilm2.getId(), testUser3.getId());
         likeDbStorage.addLike(testFilm3.getId(), testUser3.getId());
 
-        List<Film> films = recomService.getRecommendations(1);
+        List<Film> films = recommendationService.getRecommendations(1);
         assertEquals(films.size(), 1);
         assertEquals(films.get(0), testFilm3);
     }

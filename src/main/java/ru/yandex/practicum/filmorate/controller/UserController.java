@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.RecomService;
+import ru.yandex.practicum.filmorate.service.RecommendationService;
 import ru.yandex.practicum.filmorate.service.UserDbService;
 
 import javax.validation.Valid;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserDbService userDbService;
-    private final RecomService recommendationsService;
+    private final RecommendationService recommendationsService;
 
     protected void clearUsers() {
         userDbService.deleteUsers();
