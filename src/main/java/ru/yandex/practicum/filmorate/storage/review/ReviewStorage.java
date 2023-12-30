@@ -14,15 +14,13 @@ public interface ReviewStorage {
 
     Optional<Review> getReviewById(int id);
 
-    List<Review> getAllReviewsByFilmId(Integer filmId, Integer count);
+    List<Review> getSortedReviews(Integer filmId, Integer count);
 
     List<Review> getAllReviews();
 
-    Integer likeReview(int idReview, int idUser);
+    Integer likeReview(int idReview, int idUser, int upRating);
 
-    Integer dislikeReview(int idReview, int idUser);
+    Integer dislikeReview(int idReview, int idUser, int downRating);
 
-    Integer removeLikeReview(int idReview, int idUser);
-
-    Integer removeDislikeReview(int idReview, int idUser);
+    Integer removeReviewEstimation(int idReview, int idUser);
 }

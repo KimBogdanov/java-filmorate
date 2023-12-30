@@ -13,6 +13,8 @@ import java.util.List;
 
 @Service
 public class ReviewDbService {
+    public static final int DOWN_RATING = -1;
+    public static final int UP_RATING = 1;
     private final ReviewStorage reviewStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
@@ -51,22 +53,18 @@ public class ReviewDbService {
         if (filmId == null) {
             return reviewStorage.getAllReviews();
         }
-        return reviewStorage.getAllReviewsByFilmId(filmId, count);
+        return reviewStorage.getSortedReviews(filmId, count);
     }
 
-    public Integer likeReview(int idReview, int idUser) {
-        return reviewStorage.likeReview(idReview, idUser);
+    public Integer likeReview(int reviewId, int userId) {
+        return reviewStorage.likeReview(reviewId, userId, UP_RATING);
     }
 
-    public Integer dislikeReview(int idReview, int idUser) {
-        return reviewStorage.dislikeReview(idReview, idUser);
+    public Integer dislikeReview(int reviewId, int userId) {
+        return reviewStorage.dislikeReview(reviewId, userId, DOWN_RATING);
     }
 
-    public Integer removeLikeReview(int idReview, int idUser) {
-        return reviewStorage.removeLikeReview(idReview, idUser);
-    }
-
-    public Integer removeDislikeReview(int idReview, int idUser) {
-        return reviewStorage.removeDislikeReview(idReview, idUser);
+    public Integer removeReviewEstimation(int reviewId, int userId) {
+        return reviewStorage.removeReviewEstimation(reviewId, userId);
     }
 }

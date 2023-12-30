@@ -67,12 +67,12 @@ public class ReviewController {
     @DeleteMapping("/{id}/like/{userId}")
     public Integer removeLikeReview(@PathVariable int id, @PathVariable int userId) {
         log.info("DELETE request received to remove like for review by id:" + id);
-        return reviewDbService.removeLikeReview(id, userId);
+        return reviewDbService.removeReviewEstimation(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public Integer removeDislikeReview(@PathVariable int id, @PathVariable int userId) {
         log.info("DELETE request received to remove dislike for review by id:" + id);
-        return reviewDbService.removeDislikeReview(id, userId);
+        return reviewDbService.removeReviewEstimation(id, userId);
     }
 }
