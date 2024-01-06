@@ -40,7 +40,6 @@ public class ReviewController {
 
     @GetMapping("/{id}")
     public Review getReviewById(@PathVariable int id) {
-        System.out.println(id);
         log.info("GET request received to get review by id:" + id);
         return reviewDbService.getReviewById(id);
     }

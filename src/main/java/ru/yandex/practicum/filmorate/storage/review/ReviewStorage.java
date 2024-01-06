@@ -18,9 +18,7 @@ public interface ReviewStorage {
 
     List<Review> getAllReviews();
 
-    Integer likeReview(int idReview, int idUser, int upRating);
-
-    Integer dislikeReview(int idReview, int idUser, int downRating);
+    Integer changeReviewEstimation(int idReview, int idUser, int estimationValue);
 
     Integer removeReviewEstimation(int idReview, int idUser);
 }

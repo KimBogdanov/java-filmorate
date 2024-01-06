@@ -57,11 +57,11 @@ public class ReviewDbService {
     }
 
     public Integer likeReview(int reviewId, int userId) {
-        return reviewStorage.likeReview(reviewId, userId, UP_RATING);
+        return reviewStorage.changeReviewEstimation(reviewId, userId, UP_RATING);
     }
 
     public Integer dislikeReview(int reviewId, int userId) {
-        return reviewStorage.dislikeReview(reviewId, userId, DOWN_RATING);
+        return reviewStorage.changeReviewEstimation(reviewId, userId, DOWN_RATING);
     }
 
     public Integer removeReviewEstimation(int reviewId, int userId) {
