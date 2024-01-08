@@ -21,6 +21,8 @@ public class FilmDbService {
     private final MpaStorage mpaStorage;
     private final DirectorStorage directorStorage;
 
+    private final UserDbService userDbService;
+
     public Film addFilm(Film film) {
         Film newFilm = filmStorage.createFilm(film);
         if (film.getGenres() != null) {
@@ -99,5 +101,15 @@ public class FilmDbService {
             throw new NotFoundException("Режиссер не найден id = " + directorId);
         }
         return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
+
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        if (!userDbService.isExistingUser(userId)) {
+            throw new NotFoundException("User не найден id = " + userId);
+        }
+        if (!userDbService.isExistingUser(friendId)) {
+            throw new NotFoundException("Friend не найден id = " + friendId);
+        }
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 }
