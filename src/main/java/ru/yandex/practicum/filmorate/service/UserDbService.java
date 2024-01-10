@@ -33,7 +33,6 @@ public class UserDbService {
         return userStorage.getAllUsers();
     }
 
-
     public User getUserById(int id) {
         return userStorage.getUserById(id);
     }
@@ -59,5 +58,9 @@ public class UserDbService {
 
     public boolean isExistingUser(int userId) {
         return userStorage.isExistingUser(userId);
+    }
+
+    public boolean isFriend(int userId, int friendId) {
+        return userStorage.isFriend(userId, friendId);
     }
 }

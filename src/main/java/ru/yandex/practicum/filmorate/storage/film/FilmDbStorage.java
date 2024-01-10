@@ -130,11 +130,17 @@ public class FilmDbStorage implements FilmStorage {
     }
     @Override
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
-        final String sql = "SELECT DISTINCT f.*, m.MPA_NAME " +
-                "FROM films f JOIN film_likes fl1 ON f.film_id = fl1.film_id " +
-                "LEFT JOIN mpa_ratings AS m ON m.mpa_rating_id = f.mpa_rating_id " +
-                "JOIN film_likes fl2 ON f.film_id = fl2.film_id " +
-                "WHERE fl1.user_id = ? AND fl2.user_id = ?";
+        final String sql = "SELECT DISTINCT f.*, m.MPA_NAME, COUNT(FiL.USER_ID) as likes " +
+                "FROM films AS f " +
+                "JOIN mpa_ratings AS m ON m.mpa_rating_id = f.mpa_rating_id " +
+                "JOIN FILM_LIKES FiL on f.FILM_ID = FiL.FILM_ID " +
+                "where f.FILM_ID in (SELECT DISTINCT fi.FILM_ID " +
+                "FROM films AS fi " +
+                "JOIN FILM_LIKES FL on fi.FILM_ID = FL.FILM_ID " +
+                "JOIN FILM_LIKES FL1 on fi.FILM_ID = FL1.FILM_ID " +
+                "WHERE FL.USER_ID = ? AND FL1.USER_ID = ?) " +
+                "GROUP BY f.FILM_ID " +
+                "ORDER BY likes DESC";
         List<Film> films = jdbcTemplate.query(sql, this::filmMapper, userId, friendId);
         addGenresToFilms(films);
         return films;
