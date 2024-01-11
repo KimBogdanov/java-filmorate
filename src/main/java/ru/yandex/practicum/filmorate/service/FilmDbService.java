@@ -88,8 +88,8 @@ public class FilmDbService {
         return filmStorage.deleteFilmById(id);
     }
 
-    public List<Film> getPopularFilms(Integer count) {
-        return filmStorage.getPopularFilms(count);
+    public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        return filmStorage.getPopularFilms(count, genreId, year);
     }
 
     public List<Film> getFilmsByDirector(Integer directorId, String sortBy) {

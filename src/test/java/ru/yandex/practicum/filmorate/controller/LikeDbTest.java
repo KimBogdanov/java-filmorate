@@ -61,7 +61,7 @@ class LikeDbTest {
         likeDbStorage.addLike(testFilm.getId(), testUser.getId());
         likeDbStorage.addLike(testFilm2.getId(), testUser2.getId());
 
-        List<Film> likesFilm = filmStorage.getPopularFilms(10);
+        List<Film> likesFilm = filmStorage.getPopularFilms(10, null, null);
 
         assertEquals(likesFilm.size(), 2);
     }
