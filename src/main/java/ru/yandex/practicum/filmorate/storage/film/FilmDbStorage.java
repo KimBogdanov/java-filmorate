@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static java.util.function.UnaryOperator.identity;
 import static ru.yandex.practicum.filmorate.storage.genre.FilmGenreDbStorage.genreBuilder;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,7 +34,6 @@ public class FilmDbStorage implements FilmStorage {
         values.put("description", film.getDescription());
         values.put("release_date", film.getReleaseDate());
         values.put("duration", film.getDuration());
-        values.put("rate", film.getRate());
         values.put("mpa_rating_id", film.getMpa().getId());
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
@@ -117,57 +117,63 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(Integer count, Integer genreId, Integer year) {
+        String sqlFilter;
+
         if (genreId != null && year != null) {
-            String sql = "SELECT f.*, mr.*, COUNT(fl.USER_ID) " +
-                    "FROM films AS f " +
-                    "LEFT JOIN mpa_ratings AS mr ON mr.mpa_rating_id = f.mpa_rating_id " +
-                    "LEFT OUTER JOIN film_likes AS fl ON f.film_id = fl.film_id " +
-                    "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id " +
-                    "WHERE fg.genre_id = ? AND EXTRACT(YEAR FROM CAST(f.release_date AS DATE)) = ? " +
-                    "GROUP BY f.film_id " +
-                    "ORDER BY f.rate " +
-                    "DESC LIMIT ?";
-            List<Film> films = jdbcTemplate.query(sql, this::filmMapper, genreId, year, count);
-            addGenresToFilms(films);
-            return films;
+            sqlFilter = "WHERE fg.genre_id = " + genreId + " AND EXTRACT(YEAR FROM CAST(f.release_date AS DATE)) = " + year;
         } else if (genreId != null) {
-            String sql = "SELECT f.*, mr.*, COUNT(fl.USER_ID) " +
-                    "FROM films AS f " +
-                    "LEFT JOIN mpa_ratings AS mr ON mr.mpa_rating_id = f.mpa_rating_id " +
-                    "LEFT OUTER JOIN film_likes AS fl ON f.film_id = fl.film_id " +
-                    "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id " +
-                    "WHERE fg.genre_id = ? " +
-                    "GROUP BY f.film_id " +
-                    "ORDER BY f.rate " +
-                    "DESC LIMIT ?";
-            List<Film> films = jdbcTemplate.query(sql, this::filmMapper, genreId, count);
-            addGenresToFilms(films);
-            return films;
+            sqlFilter = "WHERE fg.genre_id = " + genreId;
         } else if (year != null) {
-            String sql = "SELECT f.*, mr.*, COUNT(fl.USER_ID) " +
-                    "FROM films AS f " +
-                    "LEFT JOIN mpa_ratings AS mr ON mr.mpa_rating_id = f.mpa_rating_id " +
-                    "LEFT OUTER JOIN film_likes AS fl ON f.film_id = fl.film_id " +
-                    "WHERE EXTRACT(YEAR FROM CAST(f.release_date AS DATE)) = ? " +
-                    "GROUP BY f.film_id " +
-                    "ORDER BY f.rate " +
-                    "DESC LIMIT ?";
-            List<Film> films = jdbcTemplate.query(sql, this::filmMapper, year, count);
-            addGenresToFilms(films);
-            return films;
+            sqlFilter = "WHERE EXTRACT(YEAR FROM CAST(f.release_date AS DATE)) = " + year;
         } else {
-            String sql = "SELECT f.*, mr.*, COUNT(fl.USER_ID) " +
-                    "FROM films AS f " +
-                    "LEFT JOIN mpa_ratings AS mr ON mr.mpa_rating_id = f.mpa_rating_id " +
-                    "LEFT OUTER JOIN film_likes AS fl ON f.film_id = fl.film_id " +
-                    "GROUP BY f.film_id " +
-                    "ORDER BY f.rate DESC " +
-                    "LIMIT ?";
-            List<Film> films = jdbcTemplate.query(sql, this::filmMapper, count);
-            addGenresToFilms(films);
-            return films;
+            sqlFilter = "";
         }
+
+        String sql = "SELECT f.*, mr.*, COUNT(fl.USER_ID) " +
+                "FROM films AS f " +
+                "LEFT JOIN mpa_ratings AS mr ON mr.mpa_rating_id = f.mpa_rating_id " +
+                "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id " +
+                "LEFT JOIN film_genres AS fg ON f.film_id = fg.film_id " +
+                sqlFilter + " " +
+                "GROUP BY f.film_id " +
+                "ORDER BY COUNT(fl.USER_ID) " +
+                "DESC LIMIT ?";
+        List<Film> films = jdbcTemplate.query(sql, this::filmMapper, count);
+        addGenresToFilms(films);
+        return films;
     }
+
+    @Override
+    public List<Film> getSearchFilms(String query, String by) {
+        String sqlFilter = null;
+
+        if (by.equals("title")) {
+            sqlFilter = "WHERE LOWER(f.name) LIKE LOWER('%" + query + "%') ";
+        }
+        if (by.equals("director")) {
+            sqlFilter = "WHERE LOWER(d.director_name) LIKE LOWER('%" + query + "%') ";
+        }
+        if (by.equals("title,director") || by.equals("director,title")) {
+            sqlFilter = "WHERE LOWER(f.name) LIKE LOWER('%" + query + "%') " +
+                    "OR LOWER(d.director_name) LIKE LOWER('%" + query + "%') ";
+        }
+
+        String sql = "SELECT f.*, mr.*, d.* " +
+                "FROM films AS f " +
+                "LEFT JOIN mpa_ratings AS mr ON mr.mpa_rating_id = f.mpa_rating_id " +
+                "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id " +
+                "LEFT JOIN film_director AS fd ON f.film_id = fd.film_id " +
+                "LEFT JOIN directors AS d ON d.director_id = fd.director_id " +
+                sqlFilter +
+                "GROUP BY f.film_id " +
+                "ORDER BY COUNT(fl.USER_ID) DESC";
+
+        List<Film> films = jdbcTemplate.query(sql, this::filmMapper);
+        addGenresToFilms(films);
+        addDirectorsToFilms(films);
+        return films;
+    }
+
     @Override
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
         final String sql = "SELECT DISTINCT f.*, m.MPA_NAME, COUNT(FiL.USER_ID) as likes " +
@@ -192,7 +198,6 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("release_date").toLocalDate(),
                 rs.getString("description"),
                 rs.getInt("duration"),
-                rs.getInt("rate"),
                 new Mpa(rs.getInt("mpa_rating_id"), rs.getString("mpa_name")));
     }
 

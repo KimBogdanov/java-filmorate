@@ -110,4 +110,10 @@ public class FilmController {
         log.info("FilmController getCommonFilms for userId {} friendId {}", userId, friendId);
         return filmDbService.getCommonFilms(userId, friendId);
     }
+
+    @GetMapping("/search")
+    public List<Film> getSearchFilms(@RequestParam String query,
+                                     @RequestParam String by) {
+        return filmDbService.getSearchFilms(query, by);
+    }
 }

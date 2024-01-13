@@ -106,6 +106,10 @@ public class FilmDbService {
         if (!userDbService.isExistingUser(friendId)) {
             throw new NotFoundException("Friend не найден id = " + friendId);
         }
-            return filmStorage.getCommonFilms(userId, friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
+    public List<Film> getSearchFilms(String query, String by) {
+        return filmStorage.getSearchFilms(query, by);
     }
 }
